@@ -49,7 +49,15 @@ namespace rocwmma
             ROCWMMA_DEVICE static inline void
                 exec(LoadT& data, DataT const* dataPtr, index_t offset = 0)
             {
+#ifdef ROCWMMA_ALLOW_UNALIGNED_LOADS
+                #pragma unroll
+                for(int i =0; i < VectorWidth; ++i)
+                {
+                    data.data[i] = dataPtr[offset+i];
+                }
+#else
                 data = *reinterpret_cast<LoadT const*>(&(dataPtr[offset]));
+#endif
             }
         };
 
